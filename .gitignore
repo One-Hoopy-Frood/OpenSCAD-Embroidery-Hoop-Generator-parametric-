@@ -1,0 +1,34 @@
+# OpenSCAD generated files
+*.stl
+*.off
+*.amf
+*.3mf
+*.dxf
+
+# OpenSCAD backup files
+*~
+*.bak
+
+# OS specific files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Build directories
+build/
+output/
+exports/
+
+# Temporary files
+tmp/
+temp/
+
+# Keep example STLs in examples directory
+!examples/*.stl
