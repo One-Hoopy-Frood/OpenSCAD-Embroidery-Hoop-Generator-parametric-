@@ -18,107 +18,173 @@
   
   This derivative adds:
   - Optional solid inner ring (puck mode)
-  - Independent edge chamfers
-  - Optional groove for rubber band/string retention
-  - Configurable groove profiles (elliptical/rectangular)
-  - Hex hardware recesses with future hardware size presets
-  - Comprehensive parameter validation and safety checks
+  - Rounded top corners - bottom stays square for support-free printing
+  - Anti-slip grip texture OR retention groove (mutually exclusive)
+  - Support-free groove profile with 45° walls
+  - Standard hardware size presets (M6, 1/4")
+  - Fabric thickness presets for easy gap configuration
+  
+  Version: 14
   
 ==============================================================================*/
 
-// RENDERING QUALITY
-$fn = 100; // [20:200] Circle smoothness (higher = smoother but slower)
+/* [Hidden] */
+// Rendering quality
+$fn = 100;
+// Corner rounding radius when enabled (mm)
+corner_radius = 0.8;
+// Rendering colors
+color_inner_ring = "Gold";
+color_outer_ring = "CornflowerBlue";
+color_knob = "LightSteelBlue";
+color_ghost_knob_alpha = 0.3;
+color_preview_text = "Red";
+color_preview_text_alpha = 0.6;
+// Fixed internal dimensions
+hex_recess_material_remaining = 6;
+grip_bump_size = 1;
+groove_edge_clearance = 3;
 
-/* [What to Generate] */
-// Select which part(s) to render
-part_to_render = "all"; // [all:All Parts, inner:Inner Ring Only, outer:Outer Ring Only, knob:Knob Only, assembly:Assembly View]
+/* [Part Selection] */
+// Which part(s) to generate
+Part_to_Render = "all"; // [all:All Parts, inner:Inner Ring Only, outer:Outer Ring Only, knob:Knob Only, assembly:Assembly View]
 
-/* [Basic Dimensions] */
-// Outer diameter of finished hoop (inner ring size)
-hoop_diameter_inches = 7; // [3:0.5:12]
-// Height of both inner and outer rings
-ring_height = 13; // [8:1:25]
-// Wall thickness of the hoop rings
-ring_wall_thickness = 5; // [3:0.5:10]
+/* [Inner Ring - PRIMARY DIMENSION] */
+// *** THIS SETS THE WORKING HOOP SIZE - Outer ring auto-sizes to fit ***
+Inner_Ring_Diameter_mm = 178;
+// Height of inner ring (mm)
+Inner_Ring_Height_mm = 13;
+// Wall thickness of inner ring (mm)
+Inner_Ring_Wall_mm = 5;
+// Solid disc instead of hollow ring
+Inner_Ring_Solid_Puck = false;
+// Rounded top corners
+Inner_Ring_Rounded_Corners = true;
 
-/* [Inner Ring (Tension Ring) Configuration] */
-// Make inner ring a solid disc instead of hollow ring
-inner_ring_solid_puck = false;
-// Chamfer size on top edge of inner ring
-inner_ring_top_chamfer = 0.5; // [0:0.1:3]
-// Chamfer size on bottom edge of inner ring
-inner_ring_bottom_chamfer = 0.5; // [0:0.1:3]
+/* [Inner Ring - Grip Texture] */
+// Add grip dots (disabled if groove enabled)
+Inner_Ring_Grip_Dots = true;
+// Grip dot density
+Inner_Ring_Grip_Density = 2; // [1:Low, 2:Medium, 3:High]
 
-/* [Outer Ring (Clamp Ring) Gap Settings] */
-// Minimum gap between rings when clamped (clearance)
-gap_closed = 0.3; // [0.1:0.05:1]
-// Additional gap opening when unclamped
-gap_open_additional = 1; // [0.5:0.1:3]
+/* [Inner Ring - Retention Groove] */
+// Add groove for rubber band (disables grip dots)
+Inner_Ring_Groove = false;
+// Groove distance from top (mm)
+Inner_Ring_Groove_Offset_mm = 6;
+// Groove width (mm)
+Inner_Ring_Groove_Width_mm = 2;
+// Groove depth (mm)
+Inner_Ring_Groove_Depth_mm = 1;
 
-/* [Outer Ring (Clamp Ring) Appearance] */
-// Chamfer size on top edge of outer ring
-outer_ring_top_chamfer = 0.5; // [0:0.1:3]
-// Chamfer size on bottom edge of outer ring
-outer_ring_bottom_chamfer = 0.5; // [0:0.1:3]
+/* [Outer Ring - Auto-sized from Inner Ring] */
+// Fabric thickness preset
+Outer_Ring_Fabric_Type = 2; // [0:Silk/Organza, 1:Cotton/Linen, 2:T-shirt/Quilting, 3:Canvas/Twill, 4:Denim/Upholstery]
+// Extra gap when loosened (mm)
+Outer_Ring_Extra_Gap_mm = 1;
+// Rounded top corners (includes clamp brackets)
+Outer_Ring_Rounded_Corners = true;
 
-/* [Retention Groove (For Rubber Band/String)] */
-// Add groove around outer surface of inner ring
-add_retention_groove = false;
-// Distance from top of inner ring to groove center
-groove_offset_from_top = 6.5; // [3:0.5:20]
-// Cross-sectional profile shape of groove
-groove_profile = "elliptical"; // [elliptical:Elliptical (Rounded), rectangular:Rectangular]
-// Vertical height of groove
-groove_height = 2; // [0.5:0.1:5]
-// Depth of groove into ring wall
-groove_depth = 1; // [0.3:0.1:3]
+/* [Clamp Hardware] */
+// Bolt and nut size
+Clamp_Hardware_Size = "M6"; // [M6:M6 Metric, quarter_inch:1/4 inch Imperial]
+// Bracket width (mm)
+Clamp_Bracket_Width_mm = 11;
 
-/* [Hardware Recesses] */
-// Add hex nut and bolt recesses for clamping mechanism
-add_hex_hardware_recesses = true;
-// Hex nut height (standard M5 nut is 4mm, 1/4" nut is 5mm)
-hex_nut_height = 3.5; // [2:0.5:8]
-// Hex nut width across flats (M5 is 8mm, 1/4" is 7mm)
-hex_nut_width = 8; // [5:0.5:15]
-// Bolt clearance hole diameter (M5 is 5mm, 1/4" is 6.35mm)
-bolt_hole_diameter = 5; // [3:0.1:10]
-// Countersink depth for bolt head on knob side
-bolt_countersink_depth = 4; // [2:0.5:8]
-// Countersink diameter for bolt head
-bolt_countersink_diameter = 7; // [5:0.5:12]
+/* [Tightening Knob] */
+// Knob diameter (mm)
+Knob_Diameter_mm = 13;
+// Knob height (mm)
+Knob_Height_mm = 20;
 
-/* [Clamp Bracket Dimensions] */
-// Width of clamping brackets
-bracket_width_mm = 11; // [8:1:20]
-
-/* [Advanced Settings] */
-// Show assembly with parts separated for visualization
-assembly_explode_distance = 0; // [0:5:50]
+/* [Assembly View] */
+// Explode distance (mm)
+Assembly_Explode_mm = 0;
 
 //==============================================================================
-// CALCULATED CONSTANTS AND SAFETY LIMITS
+// INTERNAL PARAMETER MAPPING
 //==============================================================================
 
-// Convert inches to millimeters
-hoop_diameter = hoop_diameter_inches * 25.4;
+// Part selection
+part_to_render = Part_to_Render;
 
-// Calculate circumferences and angles
-inner_circumference = hoop_diameter * PI;
+// Inner ring dimensions
+hoop_diameter = Inner_Ring_Diameter_mm;
+ring_height = Inner_Ring_Height_mm;
+ring_wall_thickness = Inner_Ring_Wall_mm;
+inner_ring_solid_puck = Inner_Ring_Solid_Puck;
+inner_ring_rounded = Inner_Ring_Rounded_Corners;
+
+// Grip texture - DISABLED if groove is enabled
+add_grip_texture = Inner_Ring_Grip_Dots && !Inner_Ring_Groove;
+grip_texture_density = Inner_Ring_Grip_Density;
+
+// Retention groove
+add_retention_groove = Inner_Ring_Groove;
+groove_offset_from_top = Inner_Ring_Groove_Offset_mm;
+groove_height = Inner_Ring_Groove_Width_mm;
+groove_depth = Inner_Ring_Groove_Depth_mm;
+
+// Outer ring
+fabric_type = Outer_Ring_Fabric_Type;
+gap_open_additional = Outer_Ring_Extra_Gap_mm;
+outer_ring_rounded = Outer_Ring_Rounded_Corners;
+
+// Hardware
+hardware_size = Clamp_Hardware_Size;
+bracket_width_mm = Clamp_Bracket_Width_mm;
+
+// Knob
+knob_diameter = Knob_Diameter_mm;
+knob_height = Knob_Height_mm;
+
+// Assembly
+assembly_explode_distance = Assembly_Explode_mm;
+
+// Edge radius (applied when rounded corners enabled)
+inner_ring_edge_radius = inner_ring_rounded ? corner_radius : 0;
+outer_ring_edge_radius = outer_ring_rounded ? corner_radius : 0;
+
+//==============================================================================
+// HARDWARE SPECIFICATIONS
+//==============================================================================
+
+bolt_hole_diameter = hardware_size == "M6" ? 6.5 : 6.85;
+hex_nut_width = hardware_size == "M6" ? 10 : 11.1;
+hex_nut_height = hardware_size == "M6" ? 5 : 5.5;
+
+//==============================================================================
+// FABRIC GAP LOOKUP
+//==============================================================================
+
+fabric_gap_values = [0.2, 0.3, 0.4, 0.6, 0.8];
+fabric_gap_names = ["Silk/Organza", "Cotton/Linen", "T-shirt/Quilting", "Canvas/Twill", "Denim/Upholstery"];
+gap_closed = fabric_gap_values[fabric_type];
+
+//==============================================================================
+// CALCULATED CONSTANTS
+//==============================================================================
+
+// Outer ring diameter calculations - DERIVED FROM INNER RING
 closed_diameter = hoop_diameter + (gap_closed * 2);
 open_diameter = closed_diameter + (gap_open_additional * 2);
-closed_circumference = closed_diameter * PI;
 open_circumference = open_diameter * PI;
+closed_circumference = closed_diameter * PI;
 gap_angle = 360 * (open_circumference - closed_circumference) / closed_circumference;
 gap_chord = open_circumference * gap_angle / 360;
 
-// Clamping mechanism dimensions
+// Bracket dimensions
 bracket_width = ring_wall_thickness + ring_height;
 bracket_thickness = bracket_width_mm;
 
-// Minimum safe distance from groove to ring edges
-groove_edge_clearance = 3; // Minimum 3mm from top or bottom
+// Hex recess depth (punches through outer surface by 1mm)
+hex_recess_depth = bracket_thickness - hex_recess_material_remaining + 1;
 
-// Calculate safe groove parameters
+// Grip texture
+grip_spacing = grip_texture_density == 1 ? 4 : (grip_texture_density == 2 ? 3 : 2);
+grip_surface_diameter = hoop_diameter;
+
+// Groove safety limits
 function validate_groove_offset(offset, height, ring_h) = 
     max(groove_edge_clearance + height/2, 
         min(offset, ring_h - groove_edge_clearance - height/2));
@@ -126,201 +192,294 @@ function validate_groove_offset(offset, height, ring_h) =
 function validate_groove_height(height, ring_h) =
     min(height, ring_h - (2 * groove_edge_clearance));
 
-// Apply safety validations
-safe_groove_offset = validate_groove_offset(
-    groove_offset_from_top, 
-    groove_height, 
-    ring_height
-);
-
+safe_groove_offset = validate_groove_offset(groove_offset_from_top, groove_height, ring_height);
 safe_groove_height = validate_groove_height(groove_height, ring_height);
 
-// Warning flags for user feedback
+// 45-degree groove calculations
+groove_actual_top_width = safe_groove_height;
+groove_actual_bottom_width = max(0, safe_groove_height - groove_depth * 2);
+
+// Warning flags
 groove_offset_adjusted = abs(safe_groove_offset - groove_offset_from_top) > 0.01;
-groove_height_adjusted = abs(safe_groove_height - groove_height) > 0.01;
+bracket_too_thin = bracket_thickness < (hex_recess_material_remaining + hex_nut_height);
+
+// Knob collision detection
+knob_center_x = open_diameter/2 + ring_wall_thickness/2 + ring_wall_thickness/2 + bracket_width/2;
+outer_ring_outer_radius = (open_diameter + ring_wall_thickness * 2) / 2;
+knob_collides = (knob_center_x - knob_diameter/2) < outer_ring_outer_radius;
+
+// Calculated outer ring diameter for display
+outer_ring_diameter = open_diameter + ring_wall_thickness * 2;
 
 //==============================================================================
-// PARAMETER VALIDATION AND USER WARNINGS
+// CONSOLE OUTPUT
 //==============================================================================
 
 echo("═══════════════════════════════════════════════════");
-echo("EMBROIDERY HOOP - Parameter Validation");
+echo("EMBROIDERY HOOP v14 - Parameter Summary");
 echo("═══════════════════════════════════════════════════");
-echo(str("Hoop Diameter: ", hoop_diameter, "mm (", hoop_diameter_inches, " inches)"));
-echo(str("Ring Height: ", ring_height, "mm"));
-echo(str("Wall Thickness: ", ring_wall_thickness, "mm"));
+echo("");
+echo("*** INNER RING (Primary - sets hoop working size) ***");
+echo(str("  Diameter: ", hoop_diameter, "mm"));
+echo(str("  Height: ", ring_height, "mm"));
+echo(str("  Wall: ", ring_wall_thickness, "mm"));
+echo(str("  Mode: ", inner_ring_solid_puck ? "SOLID PUCK" : "HOLLOW HOOP"));
+echo(str("  Corners: ", inner_ring_rounded ? "Rounded" : "Square"));
+
+echo("");
+echo("*** OUTER RING (Auto-calculated from inner ring) ***");
+echo(str("  Outer Diameter: ", outer_ring_diameter, "mm (auto)"));
+echo(str("  Fabric: ", fabric_gap_names[fabric_type], " (", gap_closed, "mm gap)"));
+echo(str("  Corners: ", outer_ring_rounded ? "Rounded" : "Square"));
 
 if (add_retention_groove) {
-    echo("───────────────────────────────────────────────────");
-    echo("GROOVE PARAMETERS:");
+    echo("");
+    echo("*** RETENTION GROOVE (grip dots disabled) ***");
+    echo(str("  Offset: ", safe_groove_offset, "mm from top"));
+    echo(str("  Size: ", safe_groove_height, "mm wide x ", groove_depth, "mm deep"));
+    echo("  Profile: 45° walls (support-free)");
+    if (groove_actual_bottom_width <= 0) {
+        echo("  Shape: V-groove");
+    } else {
+        echo(str("  Shape: Trapezoid (", groove_actual_bottom_width, "mm flat bottom)"));
+    }
     if (groove_offset_adjusted) {
-        echo(str("⚠ WARNING: Groove offset adjusted from ", 
-                 groove_offset_from_top, "mm to ", 
-                 safe_groove_offset, "mm to maintain ", 
-                 groove_edge_clearance, "mm clearance from edges"));
-    } else {
-        echo(str("✓ Groove offset: ", safe_groove_offset, "mm from top"));
+        echo(str("  ⚠ Offset adjusted from ", groove_offset_from_top, "mm for clearance"));
     }
-    
-    if (groove_height_adjusted) {
-        echo(str("⚠ WARNING: Groove height reduced from ", 
-                 groove_height, "mm to ", 
-                 safe_groove_height, "mm to fit within ring"));
-    } else {
-        echo(str("✓ Groove height: ", safe_groove_height, "mm"));
-    }
-    
-    echo(str("✓ Groove depth: ", groove_depth, "mm"));
-    echo(str("✓ Groove profile: ", groove_profile));
+} else if (add_grip_texture) {
+    echo("");
+    echo(str("*** GRIP DOTS: ", 
+             grip_texture_density == 1 ? "Low" : (grip_texture_density == 2 ? "Medium" : "High"),
+             " density ***"));
 }
 
-if (inner_ring_solid_puck) {
-    echo("───────────────────────────────────────────────────");
-    echo("✓ Inner ring: SOLID PUCK mode");
-} else {
-    echo("───────────────────────────────────────────────────");
-    echo("✓ Inner ring: HOLLOW HOOP mode");
+echo("");
+echo(str("*** HARDWARE: ", hardware_size == "M6" ? "M6 Metric" : "1/4\" Imperial", " ***"));
+echo(str("  Bolt hole: ", bolt_hole_diameter, "mm"));
+echo(str("  Hex nut: ", hex_nut_width, "mm"));
+
+if (bracket_too_thin) {
+    echo("  ⚠ Bracket may be too thin for hex recess");
 }
 
+if (knob_collides) {
+    echo("");
+    echo(str("⚠ WARNING: Knob (", knob_diameter, "mm) may collide with outer ring"));
+}
+
+echo("");
+echo("✓ Bottom edges square for support-free 3D printing");
 echo("═══════════════════════════════════════════════════");
 
 //==============================================================================
-// MODULE: CHAMFERED CYLINDER
+// MODULE: ROUNDED CYLINDER
 //==============================================================================
 
-module chamfered_cylinder(diameter, height, top_chamfer=0, bottom_chamfer=0) {
-    rotate_extrude(convexity=10) {
-        polygon([
-            // Bottom edge
-            [0, 0],
-            [diameter/2, 0],
-            [diameter/2 - bottom_chamfer, bottom_chamfer],
-            // Side wall
-            [diameter/2 - bottom_chamfer, height - top_chamfer],
-            // Top edge
-            [diameter/2, height - top_chamfer],
-            [diameter/2, height],
-            [0, height]
-        ]);
+module rounded_cylinder(diameter, height, edge_radius=0) {
+    if (edge_radius <= 0) {
+        cylinder(d = diameter, h = height);
+    } else {
+        safe_radius = min(edge_radius, diameter/4, height/2);
+        
+        rotate_extrude(convexity=10) {
+            difference() {
+                square([diameter/2, height]);
+                
+                translate([diameter/2 - safe_radius, height - safe_radius])
+                    difference() {
+                        square([safe_radius + 0.01, safe_radius + 0.01]);
+                        circle(r = safe_radius, $fn = 32);
+                    }
+            }
+        }
     }
 }
 
 //==============================================================================
-// MODULE: INNER RING (TENSION RING)
+// MODULE: ROUNDED CUBE (top edges only, bottom stays square for printing)
+// Rounds the top 4 vertical edges, keeps bottom flat
+//==============================================================================
+
+module rounded_cube_top(size, radius) {
+    // size = [x, y, z], radius = corner radius
+    x = size[0];
+    y = size[1];
+    z = size[2];
+    r = min(radius, x/2, y/2, z/2);
+    
+    if (r <= 0) {
+        cube(size);
+    } else {
+        hull() {
+            // Bottom corners - square (no rounding for print bed)
+            translate([0, 0, 0]) cube([x, y, 0.01]);
+            
+            // Top corners - rounded vertical edges
+            translate([r, r, z - r])
+                sphere(r = r, $fn = 16);
+            translate([x - r, r, z - r])
+                sphere(r = r, $fn = 16);
+            translate([r, y - r, z - r])
+                sphere(r = r, $fn = 16);
+            translate([x - r, y - r, z - r])
+                sphere(r = r, $fn = 16);
+            
+            // Vertical edges connecting bottom to top spheres
+            translate([r, r, 0]) cylinder(r = r, h = z - r, $fn = 16);
+            translate([x - r, r, 0]) cylinder(r = r, h = z - r, $fn = 16);
+            translate([r, y - r, 0]) cylinder(r = r, h = z - r, $fn = 16);
+            translate([x - r, y - r, 0]) cylinder(r = r, h = z - r, $fn = 16);
+        }
+    }
+}
+
+//==============================================================================
+// MODULE: GRIP TEXTURE
+//==============================================================================
+
+module grip_texture(diameter, height) {
+    bump_count = floor(diameter * PI / grip_spacing);
+    
+    for (angle = [0:360/bump_count:360]) {
+        rotate([0, 0, angle])
+            translate([diameter/2, 0, 0])
+            for (z = [grip_spacing:grip_spacing:height - grip_spacing]) {
+                translate([0, 0, z])
+                    sphere(d = grip_bump_size, $fn = 16);
+            }
+    }
+}
+
+//==============================================================================
+// MODULE: RETENTION GROOVE (45° walls for support-free printing)
+//==============================================================================
+
+module retention_groove(diameter, groove_z, depth, height) {
+    top_half_width = height / 2;
+    bottom_half_width = max(0, (height - depth * 2) / 2);
+    
+    rotate_extrude(convexity=10) {
+        translate([diameter/2 - depth, groove_z, 0]) {
+            if (bottom_half_width > 0) {
+                // Trapezoid shape
+                polygon(points=[
+                    [0, -bottom_half_width],
+                    [0, bottom_half_width],
+                    [depth + 0.1, top_half_width],
+                    [depth + 0.1, -top_half_width]
+                ]);
+            } else {
+                // V-groove (triangle)
+                polygon(points=[
+                    [0, 0],
+                    [depth + 0.1, top_half_width],
+                    [depth + 0.1, -top_half_width]
+                ]);
+            }
+        }
+    }
+}
+
+//==============================================================================
+// MODULE: INNER RING
 //==============================================================================
 
 module inner_ring() {
-    difference() {
-        // Base ring or solid puck
-        if (inner_ring_solid_puck) {
-            // Solid disc with chamfers
-            chamfered_cylinder(
-                diameter = hoop_diameter,
-                height = ring_height,
-                top_chamfer = inner_ring_top_chamfer,
-                bottom_chamfer = inner_ring_bottom_chamfer
-            );
-        } else {
-            // Hollow ring with chamfers
-            difference() {
-                chamfered_cylinder(
+    union() {
+        difference() {
+            if (inner_ring_solid_puck) {
+                rounded_cylinder(
                     diameter = hoop_diameter,
                     height = ring_height,
-                    top_chamfer = inner_ring_top_chamfer,
-                    bottom_chamfer = inner_ring_bottom_chamfer
+                    edge_radius = inner_ring_edge_radius
                 );
-                // Hollow out the center
-                translate([0, 0, -1])
-                    cylinder(d = hoop_diameter - ring_wall_thickness * 2, h = ring_height + 2);
+            } else {
+                difference() {
+                    rounded_cylinder(
+                        diameter = hoop_diameter,
+                        height = ring_height,
+                        edge_radius = inner_ring_edge_radius
+                    );
+                    translate([0, 0, -1])
+                        cylinder(d = hoop_diameter - ring_wall_thickness * 2, h = ring_height + 2);
+                }
+            }
+            
+            if (add_retention_groove) {
+                groove_z = ring_height - safe_groove_offset;
+                retention_groove(
+                    diameter = hoop_diameter,
+                    groove_z = groove_z,
+                    depth = groove_depth,
+                    height = safe_groove_height
+                );
             }
         }
         
-        // Add retention groove if enabled
-        if (add_retention_groove) {
-            translate([0, 0, safe_groove_offset]) {
-                if (groove_profile == "elliptical") {
-                    // Elliptical groove profile
-                    rotate_extrude(convexity=10)
-                        translate([hoop_diameter/2 - groove_depth/2, 0, 0])
-                        scale([groove_depth/safe_groove_height, 1, 1])
-                        circle(d = safe_groove_height);
-                } else {
-                    // Rectangular groove profile
-                    rotate_extrude(convexity=10)
-                        translate([hoop_diameter/2 - groove_depth, -safe_groove_height/2, 0])
-                        square([groove_depth, safe_groove_height]);
-                }
-            }
+        if (add_grip_texture) {
+            grip_texture(grip_surface_diameter, ring_height);
         }
     }
 }
 
 //==============================================================================
-// MODULE: OUTER RING (CLAMP RING)
+// MODULE: OUTER RING
 //==============================================================================
 
 module outer_ring() {
     union() {
-        // Main outer hoop with gap and chamfers
         difference() {
-            chamfered_cylinder(
+            rounded_cylinder(
                 diameter = open_diameter + ring_wall_thickness * 2,
                 height = ring_height,
-                top_chamfer = outer_ring_top_chamfer,
-                bottom_chamfer = outer_ring_bottom_chamfer
+                edge_radius = outer_ring_edge_radius
             );
             
-            // Hollow out center
             translate([0, 0, -1])
                 cylinder(d = open_diameter, h = ring_height + 2);
             
-            // Create gap for clamping
             translate([open_diameter/2, 0, 0])
                 cube([ring_wall_thickness * 4, gap_chord, ring_height * 4], center = true);
         }
         
-        // Clamping bracket 1 (with bolt hole)
         translate([open_diameter/2 + ring_wall_thickness/2, gap_chord/2, 0])
-            clamping_bracket(has_nut_recess = false);
+            clamping_bracket(has_hex_recess = false);
         
-        // Clamping bracket 2 (with hex nut recess)
         translate([open_diameter/2 + ring_wall_thickness/2, -gap_chord/2, 0])
             mirror([0, 1, 0])
-            clamping_bracket(has_nut_recess = true);
+            clamping_bracket(has_hex_recess = true);
     }
 }
 
 //==============================================================================
 // MODULE: CLAMPING BRACKET
+// When outer_ring_rounded is true, top edges are rounded
+// Bottom always stays square for 3D printing
 //==============================================================================
 
-module clamping_bracket(has_nut_recess = false) {
+module clamping_bracket(has_hex_recess = false) {
+    bracket_size = [ring_wall_thickness + bracket_width, bracket_thickness, ring_height];
+    
     difference() {
-        // Bracket body
-        cube([ring_wall_thickness + bracket_width, bracket_thickness, ring_height]);
-        
-        // Through-hole for bolt
-        if (add_hex_hardware_recesses) {
-            translate([ring_wall_thickness/2 + bracket_width/2, 0, ring_height/2])
-                rotate([90, 0, 0])
-                cylinder(h = 100, d = bolt_hole_diameter, center = true);
-            
-            // Hex nut recess (on one bracket only)
-            if (has_nut_recess) {
-                translate([ring_wall_thickness/2 + bracket_width/2, 0, ring_height/2])
-                    rotate([90, 0, 0])
-                    cylinder(h = hex_nut_height * 2, d = hex_nut_width, center = true, $fn = 6);
-            }
-            
-            // Countersink for bolt head on opposite side
-            translate([ring_wall_thickness/2 + bracket_width/2, bracket_thickness, ring_height/2])
-                rotate([90, 0, 0])
-                cylinder(h = bolt_countersink_depth * 2, d = hex_nut_width, center = true);
+        // Bracket body - rounded or square based on outer ring setting
+        if (outer_ring_rounded) {
+            rounded_cube_top(bracket_size, corner_radius);
         } else {
-            // Simple through-hole if hardware recesses disabled
-            translate([ring_wall_thickness/2 + bracket_width/2, 0, ring_height/2])
-                rotate([90, 0, 0])
-                cylinder(h = 100, d = 5, center = true);
+            cube(bracket_size);
+        }
+        
+        // Bolt through-hole
+        translate([ring_wall_thickness/2 + bracket_width/2, -1, ring_height/2])
+            rotate([270, 0, 0])
+            cylinder(h = bracket_thickness + 2, d = bolt_hole_diameter);
+        
+        // Hex recess (left bracket only)
+        if (has_hex_recess) {
+            translate([ring_wall_thickness/2 + bracket_width/2, 
+                      bracket_thickness - hex_recess_depth + 1,
+                      ring_height/2])
+                rotate([270, 0, 0])
+                cylinder(h = hex_recess_depth, d = hex_nut_width, $fn = 6);
         }
     }
 }
@@ -332,73 +491,82 @@ module clamping_bracket(has_nut_recess = false) {
 module tightening_knob() {
     difference() {
         union() {
-            // Main knob body
-            cylinder(h = 20, d = ring_height);
+            cylinder(h = knob_height, d = knob_diameter);
             
-            // Grip ridges around perimeter
-            for(angle = [40:40:360]) {
+            ridge_count = floor(knob_diameter * PI / 4);
+            for(angle = [0:360/ridge_count:360]) {
                 rotate([0, 0, angle])
-                    translate([ring_height/2, 0, 0])
+                    translate([knob_diameter/2, 0, 0])
                     hull() {
                         translate([0, 0, 2])
                             sphere(d = 2);
-                        translate([0, 0, 18])
+                        translate([0, 0, knob_height - 2])
                             sphere(d = 2);
                     }
             }
         }
         
-        if (add_hex_hardware_recesses) {
-            // Through-hole for bolt shaft
-            cylinder(h = 50, d = bolt_hole_diameter, center = true);
-            
-            // Countersink for bolt head
-            translate([0, 0, 11])
-                cylinder(h = 20, d = bolt_countersink_diameter, center = true);
-            
-            // Hex recess for bolt head
-            translate([0, 0, 11])
-                cylinder(h = 20, d = hex_nut_width, center = true, $fn = 6);
-        } else {
-            // Simple through-hole if hardware recesses disabled
-            cylinder(h = 50, d = 5, center = true);
-        }
+        translate([0, 0, -1])
+            cylinder(h = knob_height + 2, d = bolt_hole_diameter);
+        
+        translate([0, 0, knob_height - hex_nut_height])
+            cylinder(h = hex_nut_height + 1, d = hex_nut_width, $fn = 6);
     }
 }
 
 //==============================================================================
-// MAIN RENDERING LOGIC
+// MAIN RENDERING
 //==============================================================================
 
-if (part_to_render == "all" || part_to_render == "assembly") {
-    // Assembly view with optional explosion
-    color("SteelBlue")
-        translate([0, 0, -assembly_explode_distance])
+if (part_to_render == "all") {
+    color(color_inner_ring)
         inner_ring();
     
-    color("CornflowerBlue")
+    color(color_outer_ring)
         outer_ring();
     
-    color("LightSteelBlue")
-        translate([
-            open_diameter/2 + ring_wall_thickness/2 + ring_wall_thickness/2 + bracket_width/2,
-            0,
-            ring_height/2 + assembly_explode_distance
-        ])
-        rotate([0, 90, 0])
+    color(color_knob)
         tightening_knob();
 }
 
+if (part_to_render == "assembly") {
+    color(color_inner_ring)
+        translate([0, 0, -assembly_explode_distance])
+        inner_ring();
+    
+    color(color_outer_ring)
+        outer_ring();
+    
+    // Ghost knob in assembly view
+    bolt_hole_x = open_diameter/2 + ring_wall_thickness + bracket_width/2;
+    bolt_hole_z = ring_height/2;
+    knob_base_y = gap_chord/2 + bracket_thickness;
+    
+    color(color_knob, alpha = color_ghost_knob_alpha)
+        translate([bolt_hole_x, knob_base_y, bolt_hole_z])
+        rotate([270, 0, 0])
+        tightening_knob();
+    
+    color(color_preview_text, alpha = color_preview_text_alpha)
+        translate([bolt_hole_x, knob_base_y + knob_height/2, bolt_hole_z + knob_diameter/2 + 3])
+        rotate([90, 0, 90])
+        linear_extrude(0.5)
+        text("PREVIEW ONLY", size = 3, halign = "center", valign = "center");
+}
+
 if (part_to_render == "inner") {
-    inner_ring();
+    color(color_inner_ring)
+        inner_ring();
 }
 
 if (part_to_render == "outer") {
-    outer_ring();
+    color(color_outer_ring)
+        outer_ring();
 }
 
 if (part_to_render == "knob") {
-    tightening_knob();
+    color(color_knob)
+        tightening_knob();
 }
 
 //==============================================================================
